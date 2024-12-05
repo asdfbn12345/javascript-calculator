@@ -1,0 +1,109 @@
+.calculator {
+    width: 412px;
+    height: 784px;
+    top: 86px;
+    left: 14px;
+    gap: 0px;
+    border: 1px 0px 0px 0px;
+    opacity: 0px;
+    border: 1px solid #8E8E8E;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.screen-container {
+    width: 412px;
+    height: 184px;
+    top: 86px;
+    left: 14px;
+    gap: 0px;
+    border-radius: 24px 24px 0px 0px;
+    border: 1px 0px 0px 0px;
+    opacity: 0px;
+    background: #413C3C;
+    border: 1px solid #8E8E8E;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.input_screen {
+    font-family: Inter;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 36.31px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    margin-top: 1.5rem;
+    height: 40%;
+}
+
+.output_screen {
+    font-family: Inter;
+    font-size: 50px;
+    font-weight: 400;
+    line-height: 60.51px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    margin-bottom: 1rem;
+}
+
+.screen {
+    text-align: right;
+    color: #FFFFFF;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.keypad {
+    display: block;
+}
+
+.btn-container {
+    display: flex;
+}
+
+.single-btn {
+    width: 103px;
+    height: 120px;
+    top: 270px;
+    left: 14px;
+    gap: 0px;
+    border: 1px 0px 0px 0px;
+    opacity: 0px;
+}
+
+.double-btn {
+    width: 206px;
+    height: 120px;
+    top: 270px;
+    left: 117px;
+    gap: 0px;
+    border: 1px 0px 0px 0px;
+    opacity: 0px;
+}
+
+.operator {
+    font-family: Inter;
+    font-size: 50px;
+    font-weight: 400;
+    line-height: 60.51px;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    color: #FFFFFF;
+    background: #E89650;
+}
+
+.keypad-btn {
+    font-family: Inter;
+    font-size: 50px;
+    font-weight: 400;
+    line-height: 60.51px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    border: 1px solid #8E8E8E;
+    text-align: center;
+}
