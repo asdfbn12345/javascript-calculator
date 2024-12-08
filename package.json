@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "test": "jest",
-    "debug": "npx tsc && node dist/index.js"
+    "build": "npx tsc"
   },
   "dependencies": {
     "typescript": "^5.7.2"

@@ -9,5 +9,5 @@
     "outDir": "dist",
     "sourceMap": true
   },
-  "exclude": ["test"]
+  "exclude": ["test", ".node_modules"]
 }
