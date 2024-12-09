@@ -159,4 +159,65 @@ export class ExpressionManager implements IExpressionManager {
 
     return expressionString;
   }
+<<<<<<< HEAD
+=======
+
+  isDigitNumber(character: string): boolean {
+    return !Number.isNaN(parseInt(character));
+  }
+
+  isPoint(character: string): boolean {
+    return character === ".";
+  }
+
+  isOperand(character: string): boolean {
+    return this.isDigitNumber(character) || this.isPoint(character);
+  }
+
+  isOperator(character: string): boolean {
+    if(character.length !== 1){
+      return false;
+    }
+    if (!Number.isNaN(parseInt(character))) {
+      return false;
+    }
+
+    const operators = Object.keys(BrowserOperatorKey).filter((value) => {
+      return Number.isNaN(parseInt(value));
+    });
+
+    return operators.includes(character);
+  }
+
+  isValidNumber(string: string): boolean {
+    let canNumber = true;
+
+    const floatNumber = parseFloat(string);
+    canNumber = !Number.isNaN(floatNumber);
+
+    if (2 < string.split(".").length) {
+      return false;
+    }
+
+    return canNumber;
+  }
+
+  trimNumber(string: string): string {
+    const intNumber = parseInt(string);
+
+    if (!string.includes(".")) {
+      return intNumber.toString();
+    }
+
+    const floatNumber = parseFloat(string);
+
+    if (intNumber === floatNumber) {
+      return string;
+    }
+
+    return Number.isInteger(floatNumber)
+      ? intNumber.toString()
+      : floatNumber.toString();
+  }
+>>>>>>> -ing : 계산기 계산 로직 작성중
 }
