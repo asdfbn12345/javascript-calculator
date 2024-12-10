@@ -9,52 +9,60 @@ export function calculate(expression: Expression): number {
   const mergedExpression = mergeExpression(expression);
 
   mergedExpression.forEach((element) => {
-    if (!isOperator(element)) {
+    if (isNumber(element)) {
       operandStack.push(parseFloat(element));
-    } else {
-      if (operatorStack.length === 0) {
-        operatorStack.push(element as unknown as BrowserOperatorKey);
-      } else {
-        const operator = element as unknown as BrowserOperatorKey;
-        if (operatorStack[operatorStack.length - 1] > operator) {
-          operatorStack.push(operator);
-        } else {
-          while (
-            operatorStack.length !== 0 ||
-            operatorStack[operatorStack.length - 1] <= operator
-          ) {
-            const A = operandStack.pop();
-            const B = operandStack.pop();
-            const temp4 = operatorStack.pop();
-            let temp5: number = 0;
-            if (A !== undefined && B !== undefined) {
-              switch (temp4) {
-                case BrowserOperatorKey["*"]:
-                  temp5 = A * B;
-                  break;
-                case BrowserOperatorKey["/"]:
-                  temp5 = A / B;
-                  break;
-                case BrowserOperatorKey["+"]:
-                  temp5 = A + B;
-                  break;
-                case BrowserOperatorKey["-"]:
-                  temp5 = A - B;
-                  break;
-              }
-            }
+      return;
+    }
 
-            operandStack.push(temp5);
-          }
-        }
+    if (operatorStack.length === 0) {
+      operatorStack.push(element as unknown as BrowserOperatorKey);
+      return;
+    }
+
+    const currentOperator = element as unknown as BrowserOperatorKey;
+    if (isBbiggerthen(operatorStack[operatorStack.length - 1].toString(),currentOperator.toString())) {
+      operatorStack.push(currentOperator);
+      return;
+    }
+
+    while (
+      operandStack.length > 1 ||
+      operatorStack.length > 0 ||
+      !isBbiggerthen(operatorStack[operatorStack.length - 1].toString(),currentOperator.toString())
+    ) {
+      const a = operandStack.pop() as number;
+      const b = operandStack.pop() as number;
+      const storedOpearator = operatorStack.pop() as BrowserOperatorKey;
+      let result = calculateByOperator(a, b, storedOpearator);
+      if (result === undefined) {
+        continue;
       }
+      operandStack.push(result);
+    }
+
+    if (isBbiggerthen(operatorStack[operatorStack.length - 1].toString(),currentOperator.toString())) {
+      operatorStack.push(currentOperator);
+      return;
     }
   });
-  const temp3 = operandStack.pop();
-  if (temp3 !== undefined) {
-    result = temp3;
-  } else {
-    result = 0;
+
+  while (
+    operandStack.length !== 1 ||
+    operatorStack.length !== 0
+  ) {
+    const a = operandStack.pop() as number;
+    const b = operandStack.pop() as number;
+    const storedOpearator = operatorStack.pop() as BrowserOperatorKey;
+    let result = calculateByOperator(a, b, storedOpearator);
+    if (result === undefined) {
+      continue;
+    }
+    operandStack.push(result);
+  }
+
+  result = operandStack.pop() as number;
+  if (result === undefined) {
+    return 0;
   }
   return result;
 }
@@ -72,17 +80,85 @@ function mergeExpression(expression: Expression): string[] {
   return mergedExpression;
 }
 
-function isOperator(character: string): boolean {
-  if (character.length !== 1) {
-    return false;
-  }
-  if (!Number.isNaN(parseInt(character))) {
-    return false;
+function isNumber(character: string): boolean {
+  const floatNumber = parseFloat(character);
+  return !Number.isNaN(floatNumber);
+}
+function calculateByOperator(
+  a: number,
+  b: number,
+  operator: BrowserOperatorKey
+): number | undefined {
+  let result: number;
+  if (a === undefined && b === undefined) {
+    return undefined;
   }
 
-  const operators = Object.keys(BrowserOperatorKey).filter((value) => {
-    return Number.isNaN(parseInt(value));
-  });
+  if (operator.toString() === "*") {
+    result = a * b;
+  }
+  else if(operator.toString() === "/"){
+    result = a / b;
+  }else if (operator.toString() === "+") {
+    result = a + b;
+  }else if(operator.toString() === "-"){
+    result = a - b;
+  }
+else{
+  result =0;
+}
+/*
+  switch (operator) {
+    case BrowserOperatorKey["*"]:
+    case BrowserOperatorKey["/"]:
+      if (operator.toString() === "*") {
+        result = a * b;
+        break;
+      }
+      result = a / b;
+      break;
+    case BrowserOperatorKey["+"]:
+    case BrowserOperatorKey["-"]:
+      if (operator.toString() === "+") {
+        result = a + b;
+        break;
+      }
+      result = a - b;
+      break;
+    default:
+      result = 0;
+      break;
+  }
+*/
+  return result;
+}
 
-  return operators.includes(character);
+function isBbiggerthen (storedOperator : string, currentOperator:string):boolean{
+
+  let result : boolean = false;
+  let temp1 :number =2;
+  let temp2 : number = 2;
+  if(storedOperator ==="*" || currentOperator==="/")
+  {
+    temp1 = 0;
+  }
+  else if(storedOperator==="+" || storedOperator ==="-"){
+    temp1 = 1;
+  }
+
+  if(currentOperator ==="*" || currentOperator==="/")
+    {
+      temp2 = 0;
+    }
+    else if(currentOperator==="+" || currentOperator ==="-"){
+      temp2 = 1;
+    }
+
+    if(temp1>temp2){
+      return true;
+    }
+    else{
+      return false;
+    }
+  
 }
