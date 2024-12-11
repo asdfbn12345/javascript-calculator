@@ -14,5 +14,5 @@ export const DigitNumberValues = [
 ] as const;
 type DigitNumber = (typeof DigitNumberValues)[number];
 
-export const OperatorValues = ["+", "-", "/", "*"] as const;
+export const OperatorValues = ["+", "-", "*", "/"] as const;
 export type Operator = (typeof OperatorValues)[number];

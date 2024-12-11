@@ -1,76 +1,71 @@
 import { Expression } from "./interfaces/interfaces.js";
-import { BrowserOperatorKey } from "./types/enums.js";
-import { ExpressionOperators } from "./types/types.js";
+import { Operator } from "./types/types.js";
+import { OperatorPrecedence } from "./types/constants.js";
 
-export function calculate(expression: Expression): number {
-  let result: number;
-  const operatorStack: BrowserOperatorKey[] = [];
+export function calculate(expression: Expression): number | undefined {
+  if (expression.operands.length === 0) {
+    return undefined;
+  }
+
   const operandStack: number[] = [];
-  const mergedExpression = mergeExpression(expression);
+  const operatorStack: Operator[] = [];
+  const infixExpression: (number | Operator)[] =
+    createInfixExpression(expression);
 
-  mergedExpression.forEach((element) => {
-    if (isNumber(element)) {
-      operandStack.push(parseFloat(element));
+  infixExpression.forEach((element) => {
+    if (typeof element === "number") {
+      operandStack.push(element);
       return;
     }
 
-    if (operatorStack.length === 0) {
-      operatorStack.push(element as unknown as BrowserOperatorKey);
-      return;
-    }
+    const currentOperator = element;
 
-    const currentOperator = element as unknown as BrowserOperatorKey;
-    if (isBbiggerthen(operatorStack[operatorStack.length - 1].toString(),currentOperator.toString())) {
-      operatorStack.push(currentOperator);
-      return;
-    }
-
-    while (
-      operandStack.length > 1 ||
-      operatorStack.length > 0 ||
-      !isBbiggerthen(operatorStack[operatorStack.length - 1].toString(),currentOperator.toString())
-    ) {
-      const a = operandStack.pop() as number;
-      const b = operandStack.pop() as number;
-      const storedOpearator = operatorStack.pop() as BrowserOperatorKey;
-      let result = calculateByOperator(a, b, storedOpearator);
-      if (result === undefined) {
-        continue;
+    while (true) {
+      if (operatorStack.length === 0) {
+        operatorStack.push(currentOperator);
+        break;
       }
-      operandStack.push(result);
-    }
 
-    if (isBbiggerthen(operatorStack[operatorStack.length - 1].toString(),currentOperator.toString())) {
-      operatorStack.push(currentOperator);
-      return;
+      const topOperatorPrecedence = getTopOperatorPrecedence(operatorStack);
+      const currentOperatorPrecedence = OperatorPrecedence[currentOperator];
+
+      if (currentOperatorPrecedence < topOperatorPrecedence) {
+        operatorStack.push(currentOperator);
+        break;
+      }
+
+      const b = operandStack.pop();
+      const a = operandStack.pop();
+      const result = tryCalculateByOperator(a, b, operatorStack.pop());
+
+      if (result === undefined) {
+        break;
+      }
+
+      operandStack.push(result);
     }
   });
 
-  while (
-    operandStack.length !== 1 ||
-    operatorStack.length !== 0
-  ) {
-    const a = operandStack.pop() as number;
-    const b = operandStack.pop() as number;
-    const storedOpearator = operatorStack.pop() as BrowserOperatorKey;
-    let result = calculateByOperator(a, b, storedOpearator);
+  while (operandStack.length !== 1) {
+    const b = operandStack.pop();
+    const a = operandStack.pop();
+    const result = tryCalculateByOperator(a, b, operatorStack.pop());
+
     if (result === undefined) {
-      continue;
+      break;
     }
+
     operandStack.push(result);
   }
 
-  result = operandStack.pop() as number;
-  if (result === undefined) {
-    return 0;
-  }
-  return result;
+  return operandStack[0];
 }
 
-function mergeExpression(expression: Expression): string[] {
-  const mergedExpression: string[] = [];
+function createInfixExpression(expression: Expression): (number | Operator)[] {
+  const mergedExpression: (number | Operator)[] = [];
+
   expression.operands.forEach((operand, index) => {
-    mergedExpression.push(operand);
+    mergedExpression.push(parseFloat(operand));
     const operator = expression.operators[index];
     if (operator !== undefined) {
       mergedExpression.push(expression.operators[index]);
@@ -80,85 +75,35 @@ function mergeExpression(expression: Expression): string[] {
   return mergedExpression;
 }
 
-function isNumber(character: string): boolean {
-  const floatNumber = parseFloat(character);
-  return !Number.isNaN(floatNumber);
-}
-function calculateByOperator(
-  a: number,
-  b: number,
-  operator: BrowserOperatorKey
+function tryCalculateByOperator(
+  a?: number,
+  b?: number,
+  operator?: Operator
 ): number | undefined {
-  let result: number;
-  if (a === undefined && b === undefined) {
+  if (a === undefined || b === undefined || operator === undefined) {
     return undefined;
   }
 
-  if (operator.toString() === "*") {
-    result = a * b;
-  }
-  else if(operator.toString() === "/"){
-    result = a / b;
-  }else if (operator.toString() === "+") {
-    result = a + b;
-  }else if(operator.toString() === "-"){
-    result = a - b;
-  }
-else{
-  result =0;
-}
-/*
   switch (operator) {
-    case BrowserOperatorKey["*"]:
-    case BrowserOperatorKey["/"]:
-      if (operator.toString() === "*") {
-        result = a * b;
-        break;
-      }
-      result = a / b;
-      break;
-    case BrowserOperatorKey["+"]:
-    case BrowserOperatorKey["-"]:
-      if (operator.toString() === "+") {
-        result = a + b;
-        break;
-      }
-      result = a - b;
-      break;
-    default:
-      result = 0;
-      break;
+    case "*":
+      return a * b;
+    case "/":
+      return a / b;
+    case "+":
+      return a + b;
+    case "-":
+      return a - b;
   }
-*/
-  return result;
 }
 
-function isBbiggerthen (storedOperator : string, currentOperator:string):boolean{
-
-  let result : boolean = false;
-  let temp1 :number =2;
-  let temp2 : number = 2;
-  if(storedOperator ==="*" || currentOperator==="/")
-  {
-    temp1 = 0;
-  }
-  else if(storedOperator==="+" || storedOperator ==="-"){
-    temp1 = 1;
+function getTopOperatorPrecedence(operatorStack: Operator[]): number {
+  if (operatorStack.length === 0) {
+    return Infinity;
   }
 
-  if(currentOperator ==="*" || currentOperator==="/")
-    {
-      temp2 = 0;
-    }
-    else if(currentOperator==="+" || currentOperator ==="-"){
-      temp2 = 1;
-    }
+  const lastOperatorIndex = operatorStack.length - 1;
+  const topOperatorPrecedence =
+    OperatorPrecedence[operatorStack[lastOperatorIndex]];
 
-    if(temp1>temp2){
-      return true;
-    }
-    else{
-      return false;
-    }
-  
+  return topOperatorPrecedence;
 }

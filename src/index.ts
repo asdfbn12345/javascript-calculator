@@ -1,6 +1,5 @@
 import { Notation } from "./types/enums.js";
 import { ExpressionManager } from "./classes/expressionManager.js";
-<<<<<<< HEAD
 import { ExpressionCharacter } from "./types/types.js";
 import {
   isBackspace,
@@ -9,11 +8,7 @@ import {
   isOperator,
   isPoint,
 } from "./utilities.js";
-=======
-import { ExpressionCharacters } from "./types/types.js";
 import { calculate } from "./calculator.js";
-
->>>>>>> -ing : 계산기 계산 로직 작성중
 
 const inputScreen = document.getElementsByClassName("input_screen")[0];
 const outputScreen = document.getElementsByClassName("output_screen")[0];
@@ -94,8 +89,7 @@ function onClickOperatorButton(event: MouseEvent): void {
 }
 
 function onClickEquals(event: MouseEvent): void {
-  // TODO: 구현
-    outputScreen.innerHTML = calculate(expressionManager.expression).toString();
+  calculateExpression();
 }
 
 function onKeyDownInput(event: KeyboardEvent): void {
@@ -104,14 +98,20 @@ function onKeyDownInput(event: KeyboardEvent): void {
   } else if (isBackspace(event.key)) {
     expressionManager.deleteCharacter();
   } else if (isEquals(event.key)) {
-    // TODO: 구현
-<<<<<<< HEAD
-    // outputScreen.innerHTML = calculate();
+    calculateExpression();
     return;
-=======
-    outputScreen.innerHTML = calculate(expressionManager.expression).toString();
->>>>>>> -ing : 계산기 계산 로직 작성중
   }
 
   inputScreen.innerHTML = expressionManager.getExpression(Notation.Infix);
+}
+
+function calculateExpression() {
+  const result = calculate(expressionManager.expression);
+  if (result === undefined) {
+    outputScreen.innerHTML = "";
+    return;
+  }
+  outputScreen.innerHTML = Number.isInteger(result)
+    ? result.toString()
+    : result.toFixed(2);
 }
